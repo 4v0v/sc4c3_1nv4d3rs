@@ -18,3 +18,12 @@ function Bullet:draw()
 	lg.rectangle('fill', @.pos.x, @.pos.y, @.w, @.h)
 end
 
+function Bullet:aabb()
+	return {
+		@.pos.x,
+		@.pos.y,
+		@.w,
+		@.h,
+	}
+end
+

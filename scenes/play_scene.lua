@@ -5,14 +5,14 @@ function Play_scene:new()
 	@.camera:set_position(400, 300)
 
 	@:add('playground', Rectangle(100, 0, lg.getWidth() - 200, lg.getHeight(), {visible = false}))
-	@:add('player', Player(400, 550))
-	@:add('enemy1', Enemy(550, 50))
-	@:add('enemy2', Enemy(400, 50))
-	@:add('enemy3', Enemy(250, 50))
-	@:add('enemy4', Enemy(250, 150))
+	@:add('player'    , Player(400, 550))
+	@:add(Enemy(550, 100))
+	@:add(Enemy(400, 100))
+	@:add(Enemy(250, 100))
+	@:add(Enemy(250, 200))
 
-	@.enemies_direction        = 1
 	@.enemies_already_collided = false
+	@.enemies_direction        = 1
 
 	@:every(.5, fn() 
 		local enemies    = @:get_by_type('Enemy')
@@ -20,7 +20,7 @@ function Play_scene:new()
 
 		local enemies_outside_playground
 		ifor enemies do
-			if playground && !rect_rect_inside({it.pos.x, it.pos.y, it.w, it.h}, playground:aabb()) && !@.enemies_already_collided then
+			if playground && !rect_rect_inside(it:aabb(), playground:aabb()) && !@.enemies_already_collided then
 				enemies_outside_playground = true
 				@.enemies_direction       *= -1
 				break
@@ -39,7 +39,6 @@ function Play_scene:new()
 			if @.enemies_already_collided then @.enemies_already_collided = false end
 		end
 	end)
-
 end
 
 function Play_scene:update(dt)
@@ -58,17 +57,17 @@ function Play_scene:update(dt)
 
 	ifor bullet in bullets do 
 		ifor enemy in enemies do
-			if rect_rect_collision({bullet.pos.x, bullet.pos.y, bullet.w, bullet.h}, {enemy.pos.x, enemy.pos.y, enemy.w, enemy.h}) then
+			if rect_rect_collision(bullet:aabb(), enemy:aabb()) then
 				enemy:kill()
 				bullet:kill()
 			end
 		end
 	end
 
-	if @:count('Enemy') == 0 then
-		@:add('enemy1', Enemy(550, 50))
-		@:add('enemy2', Enemy(400, 50))
-		@:add('enemy3', Enemy(250, 50))
-		@:add('enemy4', Enemy(250, 150))
+	if #@:get_by_type('Enemy') == 0 then
+		@:add(Enemy(550, 100))
+		@:add(Enemy(400, 100))
+		@:add(Enemy(250, 100))
+		@:add(Enemy(250, 200))
 	end
 end

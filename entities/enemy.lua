@@ -16,3 +16,11 @@ function Enemy:draw()
 	lg.rectangle('fill', @.pos.x, @.pos.y, @.w, @.h)
 end
 
+function Enemy:aabb()
+	return {
+		@.pos.x,
+		@.pos.y,
+		@.w,
+		@.h,
+	}
+end

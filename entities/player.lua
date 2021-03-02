@@ -27,3 +27,11 @@ function Player:draw()
 	lg.rectangle('fill', @.pos.x, @.pos.y, @.w, @.h)
 end
 
+function Player:aabb()
+	return {
+		@.pos.x,
+		@.pos.y,
+		@.w,
+		@.h,
+	}
+end
