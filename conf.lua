@@ -1,6 +1,6 @@
 function love.conf(t)
 	t.console = true
-	t.window.title = 'mario'
+	t.window.title = 'space invaders'
 	t.window.x = 1111
 	t.window.y = 90
 	t.window.icon = "assets/images/blue_demon.png"

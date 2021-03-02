@@ -4,14 +4,42 @@ function Play_scene:new()
 	Play_scene.super.new(@)
 	@.camera:set_position(400, 300)
 
+	@:add('playground', Rectangle(100, 0, lg.getWidth() - 200, lg.getHeight(), {visible = false}))
 	@:add('player', Player(400, 550))
-
 	@:add('enemy1', Enemy(550, 50))
 	@:add('enemy2', Enemy(400, 50))
 	@:add('enemy3', Enemy(250, 50))
 	@:add('enemy4', Enemy(250, 150))
 
-	@.enemy_direction = -1
+	@.enemies_direction        = 1
+	@.enemies_already_collided = false
+
+	@:every(.5, fn() 
+		local enemies    = @:get_by_type('Enemy')
+		local playground = @:get('playground')
+
+		local enemies_outside_playground
+		ifor enemies do
+			if playground && !rect_rect_inside({it.pos.x, it.pos.y, it.w, it.h}, playground:aabb()) && !@.enemies_already_collided then
+				enemies_outside_playground = true
+				@.enemies_direction       *= -1
+				break
+			end
+		end
+
+		if enemies_outside_playground then
+			ifor enemies do
+				@:tween(.3, it.pos, {y = it.pos.y + 50}, 'in-out-cubic')
+			end
+			@.enemies_already_collided = true
+		else
+			ifor enemies do
+				@:tween(.3, it.pos, {x = it.pos.x - 50 * @.enemies_direction}, 'in-out-cubic')
+			end
+			if @.enemies_already_collided then @.enemies_already_collided = false end
+		end
+	end)
+
 end
 
 function Play_scene:update(dt)
@@ -20,24 +48,6 @@ function Play_scene:update(dt)
 	local enemies = @:get_by_type('Enemy')
 	local bullets = @:get_by_type('Bullet')
 	local player  = @:get('player')
-
-	ifor enemies do
-		it.pos.x += @.enemy_direction * 200 * dt
-	end
-
-	local enemies_collide_with_screen_border
-	ifor enemies do
-		if !rect_rect_inside({it.pos.x, it.pos.y, it.w, it.h}, {0, 0, lg.getWidth(), lg.getHeight()} ) then
-			enemies_collide_with_screen_border = true
-			break
-		end
-	end
-
-	if enemies_collide_with_screen_border then
-		@.enemy_direction *= -1
-		ifor enemies do it.pos.y += 50 end
-	end
-
 
 	ifor enemies do 
 		if it.pos.y > 500 then
@@ -55,5 +65,10 @@ function Play_scene:update(dt)
 		end
 	end
 
-
+	if @:count('Enemy') == 0 then
+		@:add('enemy1', Enemy(550, 50))
+		@:add('enemy2', Enemy(400, 50))
+		@:add('enemy3', Enemy(250, 50))
+		@:add('enemy4', Enemy(250, 150))
+	end
 end
